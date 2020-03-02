@@ -10,16 +10,17 @@ if(window.location.protocol === 'http:')
 else
 	server = "https://" + window.location.hostname + ":8089/janus";
 
-$(document).ready(function() {
+$(document).ready(async function() {
     Janus.init({debug: "all", callback: function() {
         if (!Janus.isWebrtcSupported()) {
             alert("No WebRTC support???");
             return;
         }
-
+console.log(window.location.hash)
         if (window.location.hash) {
             try {
                 let joinroom = parseInt(window.location.hash.substr(1));
+                console.log(joinroom)
                 myroom = joinroom;
                 init_subscriber(joinroom);
             } catch(err) {
@@ -38,16 +39,25 @@ function init_subscriber(joinroom) {
 
     janus = new Janus({
         server: server,
+        // server: "wss://sig0.cojam.tv/enter_room/websocket",
+        iceServers: [
+                { urls: 'stun:stun.l.google.com:19302' },
+                {
+                    urls: ['turn:13.209.250.18:3478?transport=udp'],
+                    username: 'kurento',
+                    credential: 'kurento'
+                }
+            ],
         success: function() {
             $('#substatus').text("Joining stream...");
             start_subscribing(joinroom);
         },
         error: function(error) {
             alert(error);
-            window.location.reload();
+            // window.location.reload();
         },
         destroyed: function() {
-            window.location.reload();
+            // window.location.reload();
         },
     });
 }
@@ -55,21 +65,33 @@ function init_subscriber(joinroom) {
 function init_publisher() {
     $('#publisher').show();
 
-    $('#start').one('click', function() {
+    $('#start').one('click', async function() {
+        await StreamMixer.init('myvideo');
+
+
         $('#prestart').hide();
         $('#poststart').show();
 
         janus = new Janus({
             server: server,
+            // server: "wss://sig0.cojam.tv/enter_room/websocket",
+            iceServers: [
+                    { urls: 'stun:stun.l.google.com:19302' },
+                    {
+                        urls: ['turn:13.209.250.18:3478?transport=udp'],
+                        username: 'kurento',
+                        credential: 'kurento'
+                    }
+                ],
             success: function() {
                 start_publishing();
             },
             error: function(error) {
                 alert(error);
-                window.location.reload();
+                // window.location.reload();
             },
             destroyed: function() {
-                window.location.reload();
+                // window.location.reload();
             },
         });
     });
@@ -95,7 +117,7 @@ function start_subscribing(joinroom) {
                     } else {
                         // reload in 5 seconds
                         // TODO: something better?
-                        window.setTimeout(function() { window.location.reload(); }, 5000);
+                        // window.setTimeout(function() { window.location.reload(); }, 5000);
                     }
                 },
             });
@@ -116,11 +138,12 @@ function start_subscribing(joinroom) {
             // do nothing
         },
         onremotestream: function(stream) {
+            console.log(stream)
             subscriber_handle_remotestream(stream);
         },
         oncleanup: function() {
             // do what now?
-            window.location.reload();
+            // window.location.reload();
         },
     });
 }
@@ -131,8 +154,17 @@ function start_publishing() {
         success: function(pluginHandle) {
             sfutest = pluginHandle;
             sfutest.send({
-                message: {"request":"create","permanent":false,"secret":Janus.randomString(12),"is_private":true},
+                message: {
+                    request:"create",
+                    permanent:false,
+                    videocodec:"h264",
+                    record:true,
+                    rec_dir:"/tmp",
+                    secret:Janus.randomString(12),
+                    is_private:true
+                },
                 success: function(msg) {
+                    console.log(msg)
                     myroom = msg["room"];
                     let url = window.location.origin + window.location.pathname + '#' + myroom;
                     $('#loading').hide();
@@ -172,7 +204,7 @@ function start_publishing() {
         },
         oncleanup: function() {
             // do what now?
-            window.location.reload();
+            // window.location.reload();
         },
     });
 }
@@ -205,11 +237,26 @@ function publisher_handle_jsep(jsep) {
     sfutest.handleRemoteJsep({jsep: jsep});
 }
 
-function publisher_handle_localstream(stream) {
+async function publisher_handle_localstream(stream) {
     console.log(stream);
-    Janus.attachMediaStream($('#myvideo').get(0), stream);
-    document.getElementById('myvideo').srcObject = stream;
+    // Janus.attachMediaStream($('#myvideo').get(0), stream);
+    // document.getElementById('myvideo').srcObject = stream;
     console.log("ATTACH MEDIA STREAM");
+}
+
+var flipHorizontal = false;
+function initPoseNet() {
+
+    var canvasElement = document.getElementById('myvideo');
+
+    posenet.load().then(function(net) {
+      const pose = net.estimateSinglePose(canvasElement, {
+        flipHorizontal: true
+      });
+      return pose;
+    }).then(function(pose){
+      console.log(pose);
+    })
 }
 
 function publishOwnFeed() {
@@ -237,9 +284,9 @@ function subscriber_handle_msg(msg) {
     if (msg["videoroom"] == "event") {
         if (msg["error_code"] == 428) { // no such feed
             // publisher isn't here yet, so reload the page
-            window.setTimeout(function() {
-                window.location.reload();
-            }, 1000);
+            // window.setTimeout(function() {
+            //     window.location.reload();
+            // }, 1000);
         }
     }
 }
@@ -262,6 +309,7 @@ function subscriber_handle_jsep(jsep) {
 }
 
 function subscriber_handle_remotestream(stream) {
+    console.log("subscribe", stream)
     $('#substatus').text('');
     Janus.attachMediaStream($('#remotestream').get(0), stream);
 }

@@ -4,6 +4,10 @@
 <title>jetstream</title>
 <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"/>
 <link rel="stylesheet" type="text/css" href="css/jetstream.css"/>
+<!-- Load TensorFlow.js -->
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+<!-- Load Posenet -->
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/posenet"></script>
 <meta name="viewport" content="width=device-width" />
 </head>
 <body>
@@ -63,7 +67,8 @@
 <div id="show-streamurl" style="display:none">Share this stream URL: <a target="_blank" id="streamurl"></a> <small>(open in a new tab to test the stream)</small></div><br>
 <span id="slowlink" style="opacity:0;color:red;font-family:monospace">SLOW LINK</span><br>
 <div id="player" style="display:none">
-<video style="max-width:100%; max-height:100%" id="myvideo" autoplay playsinline muted="muted"></video><br>
+  <canvas style="max-width:100%; max-height:100%" id="myvideo"></canvas><br>
+  <!-- <video style="max-width:100%; max-height:100%" id="myvideo" autoplay playsinline muted="muted"></video><br> -->
 Bitrate limit: <select id="bitrate">
 <option value="0" default>No limit</option>
 <option value="64">64 kbit/sec</option>
@@ -81,7 +86,7 @@ You could try lowering the bitrate limit.</span>
 
 <div id="subscriber" style="display:none">
 <span id="substatus">Loading...</span><br>
-<video style="max-width:100%; max-height:100%" id="remotestream" autoplay playsinline></video>
+<video style="max-width:100%; max-height:100%" id="remotestream" autoplay playsinline muted></video>
 </div>
 
 </div>
@@ -91,5 +96,7 @@ You could try lowering the bitrate limit.</span>
 <script type="text/javascript" src="js/adapter.min.js"></script>
 <script type="text/javascript" src="js/janus.js"></script>
 <script type="text/javascript" src="js/jetstream.js"></script>
+<script type="text/javascript" src="js/stream-mixer.min.js"></script>
+
 </body>
 </html>
