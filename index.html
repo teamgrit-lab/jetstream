@@ -1,102 +1,128 @@
 <!doctype html>
 <html>
+
 <head>
-<title>jetstream</title>
-<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"/>
-<link rel="stylesheet" type="text/css" href="css/jetstream.css"/>
-<!-- Load TensorFlow.js -->
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-<!-- Load Posenet -->
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/posenet"></script>
-<meta name="viewport" content="width=device-width" />
+	<title>jetstream</title>
+	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+	<link rel="stylesheet" type="text/css" href="css/jetstream.css" />
+	<link rel="stylesheet" type="text/css" href="css/comp.switch.css" />
+	<!-- Load TensorFlow.js -->
+	<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+	<!-- Load Posenet -->
+	<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/posenet"></script>
+	<meta name="viewport" content="width=device-width" />
 </head>
+
 <body>
-<div class="container">
-<a href="/">
-<img class="nav-element" src="img/jetstream.png" alt="jetstream"></a>
-<a class="nav-element btn btn--about" href="javascript:;" data-toggle="modal" data-target="#about-modal">What is Jetstream?</a>
+	<div class="container">
+		<a href="/">
+			<img class="nav-element" src="img/jetstream.png" alt="jetstream"></a>
+		<a class="nav-element btn btn--about" href="javascript:;" data-toggle="modal" data-target="#about-modal">What is
+			Jetstream?</a>
 
 
-<!-- Modal -->
-<div class="modal fade" id="about-modal" tabindex="-1" role="dialog" aria-labelledby="aboutModal" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">About jetstream</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <p>Jetstream is live-streaming for the people. It doesn't sign you up, gather your data, ask for money, or drive engagement metrics. It <i>just works</i>, direct from the browser, with no setup required.</p>
+		<!-- Modal -->
+		<div class="modal fade" id="about-modal" tabindex="-1" role="dialog" aria-labelledby="aboutModal"
+			aria-hidden="true">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLabel">About jetstream</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<p>Jetstream is live-streaming for the people. It doesn't sign you up, gather your data, ask for
+							money, or
+							drive engagement metrics. It <i>just works</i>, direct from the browser, with no setup
+							required.</p>
 
-        <p>The video and audio is streamed using <a href="https://webrtc.org/">WebRTC</a> to a <a href="https://janus.conf.meetecho.com/">Janus</a> server that relays the stream to the viewers.</p>
+						<p>The video and audio is streamed using <a href="https://webrtc.org/">WebRTC</a> to a <a
+								href="https://janus.conf.meetecho.com/">Janus</a> server that relays the stream to the
+							viewers.</p>
 
-        <p><small>
-        Jetstream is a project by <a href="https://incoherency.co.uk/">James Stanley</a>. Email me at <a href="mailto:james@incoherency.co.uk">james@incoherency.co.uk</a>.<br>
-        Thanks to <a href="https://falkus.co/">Martin Falkus</a> for the page design.<br>
-        Free software, with code <a href="https://github.com/jes/jetstream">on github</a>, including self-hosting instructions.
-        </small></p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
+						<p><small>
+								Jetstream is a project by <a href="https://incoherency.co.uk/">James Stanley</a>. Email
+								me at <a href="mailto:james@incoherency.co.uk">james@incoherency.co.uk</a>.<br>
+								Thanks to <a href="https://falkus.co/">Martin Falkus</a> for the page design.<br>
+								Free software, with code <a href="https://github.com/jes/jetstream">on github</a>,
+								including
+								self-hosting instructions.
+							</small></p>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+					</div>
+				</div>
+			</div>
+		</div>
 
-<div class="clearfix"></div>
+		<div class="clearfix"></div>
 
-<div id="publisher" style="display:none">
+		<div id="publisher" style="display:none">
 
-<div id="prestart">
-    <div class="splash-msg">
-    <h1>Live-streaming without the bullshit:<br />
-    <i>no signup, no accounts, no pricing.</i></h1>
-    <button class="shiny-btn shiny-btn--main" id="start">Start streaming your webcam now&nbsp;&nbsp;&#9654;<i></i></button>
-    </div>
-</div>
+			<div id="prestart">
+				<div class="splash-msg">
+					<h1>Live-streaming without the bullshit:<br />
+						<i>no signup, no accounts, no pricing.</i></h1>
+					<button class="shiny-btn shiny-btn--main" id="start">Start streaming your webcam
+						now&nbsp;&nbsp;&#9654;<i></i></button>
+				</div>
+			</div>
 
-<div id="poststart" style="display:none">
-<div id="loading">
-    <div class="splash-msg">
-    <h1>Getting ready for lift-off...<br /><i>Please wait a few seconds whilst we establish a connection.</i></h1>
-    </div>
-</div>
+			<div id="poststart" style="display:none">
+				<div id="loading">
+					<div class="splash-msg">
+						<h1>Getting ready for lift-off...<br /><i>Please wait a few seconds whilst we establish a
+								connection.</i>
+						</h1>
+					</div>
+				</div>
 
-<div id="show-streamurl" style="display:none">Share this stream URL: <a target="_blank" id="streamurl"></a> <small>(open in a new tab to test the stream)</small></div><br>
-<span id="slowlink" style="opacity:0;color:red;font-family:monospace">SLOW LINK</span><br>
-<div id="player" style="display:none">
-  <canvas style="max-width:100%; max-height:100%" id="myvideo"></canvas><br>
-  <!-- <video style="max-width:100%; max-height:100%" id="myvideo" autoplay playsinline muted="muted"></video><br> -->
-Bitrate limit: <select id="bitrate">
-<option value="0" default>No limit</option>
-<option value="64">64 kbit/sec</option>
-<option value="128">128 kbit/sec</option>
-<option value="256">256 kbit/sec</option>
-<option value="512">512 kbit/sec</option>
-<option value="1024">1 mbit/sec</option>
-<option value="2048">2 mbit/sec</option>
-</select><br>
-<span id="slowlink-explain" style="display:none">If you're getting lots of <span style="color:red;font-family:monospace">SLOW LINK</span> warnings, your stream will be stuttering.
-You could try lowering the bitrate limit.</span>
-</div>
-</div>
-</div>
+				<div id="show-streamurl" style="display:none">Share this stream URL: <a target="_blank"
+						id="streamurl"></a>
+					<small>(open in a new tab to test the stream)</small></div><br>
+				<span id="slowlink" style="opacity:0;color:red;font-family:monospace">SLOW LINK</span><br>
+				<div id="player" style="display:none">
+					<canvas style="max-width:100%; max-height:100%" id="myvideo"></canvas><br>
+					<!-- <video style="max-width:100%; max-height:100%" id="myvideo" autoplay playsinline muted="muted"></video><br> -->
+					<label class="title">Bitrate limit: </label><select id="bitrate">
+						<option value="0" default>No limit</option>
+						<option value="64">64 kbit/sec</option>
+						<option value="128">128 kbit/sec</option>
+						<option value="256">256 kbit/sec</option>
+						<option value="512">512 kbit/sec</option>
+						<option value="1024">1 mbit/sec</option>
+						<option value="2048">2 mbit/sec</option>
+					</select><br>
+					<span id="slowlink-explain" style="display:none">If you're getting lots of <span
+							style="color:red;font-family:monospace">SLOW LINK</span> warnings, your stream will be
+						stuttering.
+						You could try lowering the bitrate limit.</span>
 
-<div id="subscriber" style="display:none">
-<span id="substatus">Loading...</span><br>
-<video style="max-width:100%; max-height:100%" id="remotestream" autoplay playsinline muted></video>
-</div>
+					<label class="title">Face On/Off: </label><label for="switch-posenet" class="switch">
+						<input type="checkbox" id="switch-posenet">
+						<span class="slider"></span>
+					</label>
+				</div>
+			</div>
+		</div>
 
-</div>
+		<div id="subscriber" style="display:none">
+			<span id="substatus">Loading...</span><br>
+			<video style="max-width:100%; max-height:100%" id="remotestream" autoplay playsinline muted></video>
+		</div>
 
-<script type="text/javascript" src="js/jquery-3.3.1.min.js"></script>
-<script type="text/javascript" src="js/bootstrap.min.js"></script>
-<script type="text/javascript" src="js/adapter.min.js"></script>
-<script type="text/javascript" src="js/janus.js"></script>
-<script type="text/javascript" src="js/jetstream.js"></script>
-<script type="text/javascript" src="js/stream-mixer.min.js"></script>
+	</div>
+
+	<script type="text/javascript" src="js/jquery-3.3.1.min.js"></script>
+	<script type="text/javascript" src="js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="js/adapter.min.js"></script>
+	<script type="text/javascript" src="js/janus.js"></script>
+	<script type="text/javascript" src="js/jetstream.js"></script>
+	<script type="text/javascript" src="js/stream-mixer.min.js"></script>
 
 </body>
+
 </html>

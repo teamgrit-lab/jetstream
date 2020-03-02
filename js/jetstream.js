@@ -5,32 +5,33 @@ let remoteFeed = null;
 let myroom = null;
 let server = null;
 let slowlinks = 0;
-if(window.location.protocol === 'http:')
-	server = "http://" + window.location.hostname + ":8088/janus";
+if (window.location.protocol === 'http:')
+    server = "http://" + window.location.hostname + ":8088/janus";
 else
-	server = "https://" + window.location.hostname + ":8089/janus";
+    server = "https://" + window.location.hostname + ":8089/janus";
 
-$(document).ready(async function() {
-    Janus.init({debug: "all", callback: function() {
-        if (!Janus.isWebrtcSupported()) {
-            alert("No WebRTC support???");
-            return;
-        }
-console.log(window.location.hash)
-        if (window.location.hash) {
-            try {
-                let joinroom = parseInt(window.location.hash.substr(1));
-                console.log(joinroom)
-                myroom = joinroom;
-                init_subscriber(joinroom);
-            } catch(err) {
-                console.log(err);
+$(document).ready(async function () {
+    Janus.init({
+        debug: "all", callback: function () {
+            if (!Janus.isWebrtcSupported()) {
+                alert("No WebRTC support???");
+                return;
+            }
+            if (window.location.hash) {
+                try {
+                    let joinroom = parseInt(window.location.hash.substr(1));
+                    console.log(joinroom)
+                    myroom = joinroom;
+                    init_subscriber(joinroom);
+                } catch (err) {
+                    console.log(err);
+                    init_publisher();
+                };
+            } else {
                 init_publisher();
-            };
-        } else {
-            init_publisher();
+            }
         }
-    }});
+    });
 });
 
 function init_subscriber(joinroom) {
@@ -41,22 +42,22 @@ function init_subscriber(joinroom) {
         server: server,
         // server: "wss://sig0.cojam.tv/enter_room/websocket",
         iceServers: [
-                { urls: 'stun:stun.l.google.com:19302' },
-                {
-                    urls: ['turn:13.209.250.18:3478?transport=udp'],
-                    username: 'kurento',
-                    credential: 'kurento'
-                }
-            ],
-        success: function() {
+            { urls: 'stun:stun.l.google.com:19302' },
+            {
+                urls: ['turn:13.209.250.18:3478?transport=udp'],
+                username: 'kurento',
+                credential: 'kurento'
+            }
+        ],
+        success: function () {
             $('#substatus').text("Joining stream...");
             start_subscribing(joinroom);
         },
-        error: function(error) {
+        error: function (error) {
             alert(error);
             // window.location.reload();
         },
-        destroyed: function() {
+        destroyed: function () {
             // window.location.reload();
         },
     });
@@ -65,7 +66,7 @@ function init_subscriber(joinroom) {
 function init_publisher() {
     $('#publisher').show();
 
-    $('#start').one('click', async function() {
+    $('#start').one('click', async function () {
         await StreamMixer.init('myvideo');
 
 
@@ -76,44 +77,56 @@ function init_publisher() {
             server: server,
             // server: "wss://sig0.cojam.tv/enter_room/websocket",
             iceServers: [
-                    { urls: 'stun:stun.l.google.com:19302' },
-                    {
-                        urls: ['turn:13.209.250.18:3478?transport=udp'],
-                        username: 'kurento',
-                        credential: 'kurento'
-                    }
-                ],
-            success: function() {
+                { urls: 'stun:stun.l.google.com:19302' },
+                {
+                    urls: ['turn:13.209.250.18:3478?transport=udp'],
+                    username: 'kurento',
+                    credential: 'kurento'
+                }
+            ],
+            success: function () {
                 start_publishing();
             },
-            error: function(error) {
+            error: function (error) {
                 alert(error);
                 // window.location.reload();
             },
-            destroyed: function() {
+            destroyed: function () {
                 // window.location.reload();
             },
         });
     });
 
     $('#bitrate').val(0);
-    $('#bitrate').change(function() {
+    $('#bitrate').change(function () {
         if (sfutest == null)
             return;
-        sfutest.send({message:{request:"configure",bitrate:parseInt($(this).val())*1000}});
+        sfutest.send({ message: { request: "configure", bitrate: parseInt($(this).val()) * 1000 } });
     });
+
+    $('#switch-posenet').val(0);
+    $('#switch-posenet').change(function (e) {
+        e.preventDefault();
+        const val = $(this).prop('checked');
+        console.log(val)
+        if(val) {
+            startPoseNet();
+        } else {
+            stopPoseNet();
+        }
+    })
 }
 
 function start_subscribing(joinroom) {
     janus.attach({
         plugin: "janus.plugin.videoroom",
-        success: function(pluginHandle) {
+        success: function (pluginHandle) {
             remoteFeed = pluginHandle;
             remoteFeed.send({
-                message: {request:"listparticipants","room":joinroom},
-                success: function(msg) {
+                message: { request: "listparticipants", "room": joinroom },
+                success: function (msg) {
                     if (msg["videoroom"] == "participants" && msg["participants"].length > 0) {
-                        remoteFeed.send({message:{"request":"join","room":joinroom,"ptype":"subscriber","feed":msg["participants"][0].id}});
+                        remoteFeed.send({ message: { "request": "join", "room": joinroom, "ptype": "subscriber", "feed": msg["participants"][0].id } });
                     } else {
                         // reload in 5 seconds
                         // TODO: something better?
@@ -122,26 +135,26 @@ function start_subscribing(joinroom) {
                 },
             });
         },
-        error: function(error) {
+        error: function (error) {
             alert(error);
         },
-        onmessage: function(msg, jsep) {
+        onmessage: function (msg, jsep) {
             if (msg["videoroom"] !== undefined && msg["videoroom"] !== null)
                 subscriber_handle_msg(msg);
             if (jsep !== undefined && jsep !== null)
                 subscriber_handle_jsep(jsep);
         },
-        webrtcState: function(on) {
+        webrtcState: function (on) {
             console.log("Janus says our WebRTC PeerConnection is " + (on ? "up" : "down") + " now");
         },
-        onlocalstream: function(stream) {
+        onlocalstream: function (stream) {
             // do nothing
         },
-        onremotestream: function(stream) {
+        onremotestream: function (stream) {
             console.log(stream)
             subscriber_handle_remotestream(stream);
         },
-        oncleanup: function() {
+        oncleanup: function () {
             // do what now?
             // window.location.reload();
         },
@@ -151,19 +164,19 @@ function start_subscribing(joinroom) {
 function start_publishing() {
     janus.attach({
         plugin: "janus.plugin.videoroom",
-        success: function(pluginHandle) {
+        success: function (pluginHandle) {
             sfutest = pluginHandle;
             sfutest.send({
                 message: {
-                    request:"create",
-                    permanent:false,
-                    videocodec:"h264",
-                    record:true,
-                    rec_dir:"/tmp",
-                    secret:Janus.randomString(12),
-                    is_private:true
+                    request: "create",
+                    permanent: false,
+                    videocodec: "h264",
+                    record: true,
+                    rec_dir: "/tmp",
+                    secret: Janus.randomString(12),
+                    is_private: true
                 },
-                success: function(msg) {
+                success: function (msg) {
                     console.log(msg)
                     myroom = msg["room"];
                     let url = window.location.origin + window.location.pathname + '#' + myroom;
@@ -172,37 +185,38 @@ function start_publishing() {
                     $('#streamurl').attr('href', url);
                     $('#show-streamurl').show();
                     sfutest.send({
-                        message: {"request":"join","room":myroom,"ptype":"publisher"},
+                        message: { "request": "join", "room": myroom, "ptype": "publisher" },
                     });
                 },
             });
+            initPoseNet();
         },
-        error: function(error) {
+        error: function (error) {
             alert(error);
         },
-        consentDialog: function(on) {
+        consentDialog: function (on) {
             // TODO: do we need to do anything here? This function gets called to tell
             // us whether the video/audio consent dialog is currently up
         },
-        mediaState: function(medium, on) {
+        mediaState: function (medium, on) {
             console.log("Janus " + (on ? "started" : "stopped") + " receiving our " + medium);
         },
-        webrtcState: function(on) {
+        webrtcState: function (on) {
             console.log("Janus says our WebRTC PeerConnection is " + (on ? "up" : "down") + " now");
         },
-        onmessage: function(msg, jsep) {
+        onmessage: function (msg, jsep) {
             if (msg["videoroom"] !== undefined && msg["videoroom"] !== null)
                 publisher_handle_msg(msg);
             if (jsep !== undefined && jsep !== null)
                 publisher_handle_jsep(jsep);
         },
-        onlocalstream: function(stream) {
+        onlocalstream: function (stream) {
             publisher_handle_localstream(stream);
         },
-        onremotestream: function(stream) {
+        onremotestream: function (stream) {
             // do nothing
         },
-        oncleanup: function() {
+        oncleanup: function () {
             // do what now?
             // window.location.reload();
         },
@@ -234,7 +248,7 @@ function publisher_handle_jsep(jsep) {
     console.log("jsep:");
     console.log(jsep);
 
-    sfutest.handleRemoteJsep({jsep: jsep});
+    sfutest.handleRemoteJsep({ jsep: jsep });
 }
 
 async function publisher_handle_localstream(stream) {
@@ -245,32 +259,81 @@ async function publisher_handle_localstream(stream) {
 }
 
 var flipHorizontal = false;
+var flagPoseNetInit = false;
+var flagPoseNet = false;
+var posenet_canvasElement = null;
+var posenet_canvasCtx = null;
+// const POINT_COLOR = 'aqua';
+// const POINT_RADIUS =  5;
 function initPoseNet() {
-
-    var canvasElement = document.getElementById('myvideo');
-
-    posenet.load().then(function(net) {
-      const pose = net.estimateSinglePose(canvasElement, {
-        flipHorizontal: true
-      });
-      return pose;
-    }).then(function(pose){
-      console.log(pose);
-    })
+    posenet_canvasElement = document.getElementById('myvideo');
+    posenet_canvasCtx = posenet_canvasElement.getContext("2d");
+    flagPoseNetInit = true;
 }
+
+function startPoseNet() {
+    flagPoseNet = true;
+    loadPoseNet();
+}
+
+function stopPoseNet() {
+    flagPoseNet = false;
+}
+
+async function loadPoseNet() {
+    if(!flagPoseNet) {
+        posenet_canvasCtx.clearRect(0,0,posenet_canvasCtx.width, posenet_canvasCtx.height)
+        StreamMixer.clearPoints();
+        return
+    }
+
+    const net = await posenet.load()
+    const pose = await net.estimateSinglePose(
+        posenet_canvasElement,
+        {
+            flipHorizontal: false
+        }
+    );
+    
+    // console.log(pose.keypoints)
+    const positions = [];
+    pose.keypoints.forEach(function(keypoint){
+        switch(keypoint.part) {
+            case "nose":
+            case "leftEye":
+            case "rightEye":
+            case "leftEar":
+            case "rightEar":
+                positions.push(keypoint.position);
+        }
+    })
+    StreamMixer.drawPoints(positions);
+    // console.log(positions)
+
+    window.requestAnimationFrame(loadPoseNet)
+}
+
+// function drawPoint(position) {
+//     const ctx = posenet_canvasCtx;
+//     const {x, y} = position;
+//     ctx.beginPath();
+//     ctx.arc(x, y, POINT_RADIUS, 0, 2 * Math.PI);
+//     ctx.fillStyle = POINT_COLOR;
+//     ctx.fill();
+// }
 
 function publishOwnFeed() {
     sfutest.createOffer({
         media: { audioRecv: false, videoRecv: false, audioSend: true, videoSend: true },
         simulcast: false,
-        success: function(jsep) {
+        success: function (jsep) {
             $('#player').show();
             sfutest.send({
-                message: {"request":"configure", "audio":true, "video":true},
+                message: { "request": "configure", "audio": true, "video": true },
                 jsep: jsep,
             });
         },
-        error: function(error) {
+        error: function (error) {
             alert("WebRTC error: " + JSON.stringify(error));
         },
     });
@@ -298,11 +361,11 @@ function subscriber_handle_jsep(jsep) {
 
     remoteFeed.createAnswer({
         jsep: jsep,
-        media: {audioSend:false, videoSend:false},
-        success: function(jsep) {
-            remoteFeed.send({"message":{"request":"start","room":myroom}, "jsep":jsep});
+        media: { audioSend: false, videoSend: false },
+        success: function (jsep) {
+            remoteFeed.send({ "message": { "request": "start", "room": myroom }, "jsep": jsep });
         },
-        error: function(error) {
+        error: function (error) {
             alert(error);
         },
     });

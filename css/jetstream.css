@@ -209,3 +209,8 @@ body {
   }
 }
 
+
+div#player label.title{
+  padding: .5em;
+  background: rgba(255, 255, 255, 0.6);
+}
