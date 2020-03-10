@@ -67,8 +67,7 @@ function init_publisher() {
     $('#publisher').show();
 
     $('#start').one('click', async function () {
-        await StreamMixer.init('myvideo');
-
+        await StreamMixer.init({elementID: 'myvideo', width: 640, height: 360});
 
         $('#prestart').hide();
         $('#poststart').show();
@@ -95,6 +94,18 @@ function init_publisher() {
                 // window.location.reload();
             },
         });
+    });
+
+    $('#video-res').val(1);
+    $('#video-res').change(function () {
+        const val = parseInt($(this).val());
+        console.log(val)
+        switch(val) {
+            case 1: StreamMixer.setResolution({width: 320, height: 240}); break;
+            case 2: StreamMixer.setResolution({width: 640, height: 360}); break;
+            case 3: StreamMixer.setResolution({width: 1280, height: 720}); break;
+        }
+        // sfutest.send({ message: { request: "configure", bitrate: parseInt($(this).val()) * 1000 } });
     });
 
     $('#bitrate').val(0);
@@ -189,7 +200,6 @@ function start_publishing() {
                     });
                 },
             });
-            initPoseNet();
         },
         error: function (error) {
             alert(error);
@@ -211,6 +221,7 @@ function start_publishing() {
                 publisher_handle_jsep(jsep);
         },
         onlocalstream: function (stream) {
+            initPoseNet();
             publisher_handle_localstream(stream);
         },
         onremotestream: function (stream) {
@@ -261,11 +272,20 @@ async function publisher_handle_localstream(stream) {
 var flipHorizontal = false;
 var flagPoseNetInit = false;
 var flagPoseNet = false;
+var posenet_videoElement = null;
 var posenet_canvasElement = null;
 var posenet_canvasCtx = null;
 // const POINT_COLOR = 'aqua';
 // const POINT_RADIUS =  5;
 function initPoseNet() {
+    const firstObjID = StreamMixer.getIDs()[0];
+    posenet_videoElement = StreamMixer.getVideoElement(firstObjID);
+    posenet_videoElement.width = 640;
+    posenet_videoElement.height = 360;
+    // document.body.appendChild(
+    //     posenet_videoElement
+    // )
+    
     posenet_canvasElement = document.getElementById('myvideo');
     posenet_canvasCtx = posenet_canvasElement.getContext("2d");
     flagPoseNetInit = true;
@@ -287,27 +307,37 @@ async function loadPoseNet() {
         return
     }
 
-    const net = await posenet.load()
-    const pose = await net.estimateSinglePose(
-        posenet_canvasElement,
+    const net = await posenet.load(
         {
-            flipHorizontal: false
+            architecture: 'MobileNetV1',
+            outputStride: 16,
+            inputResolution: 500,
+            multiplier: 0.75,
+            quantBytes: 2
+        }
+    )
+    const poses = await net.estimatePoses(
+        posenet_videoElement,
+        {
+            flipHorizontal: false,
+            decodingMethod: 'single-person'
         }
     );
-    
-    // console.log(pose.keypoints)
     const positions = [];
-    pose.keypoints.forEach(function(keypoint){
-        switch(keypoint.part) {
-            case "nose":
-            case "leftEye":
-            case "rightEye":
-            case "leftEar":
-            case "rightEar":
-                positions.push(keypoint.position);
-        }
+    poses.forEach(({keypoints}) => {
+        keypoints.forEach( keypoint => {
+            switch(keypoint.part) {
+                case "nose":
+                case "leftEye":
+                case "rightEye":
+                case "leftEar":
+                case "rightEar":
+                    positions.push(keypoint.position);
+            }
+        })
     })
     StreamMixer.drawPoints(positions);
+    
     // console.log(positions)
 
     window.requestAnimationFrame(loadPoseNet)

@@ -1770,7 +1770,6 @@ function Janus(gatewayCallbacks) {
 				}
 			};
 			config.pc.ontrack = function(event) {
-				console.log("ON TRACK", event);
 				Janus.log("Handling Remote Track");
 				Janus.debug(event);
 				if(!event.streams)
@@ -1802,9 +1801,15 @@ function Janus(gatewayCallbacks) {
 		if(addTracks && stream) {
 			Janus.log('Adding local stream');
 			var simulcast2 = (callbacks.simulcast2 === true);
+			Janus.log(simulcast2)
 			stream.getTracks().forEach(function(track) {
 				Janus.log('Adding local track:', track);
 				if(!simulcast2) {
+					// custom source (2020-03-10 기만)
+					// video track은 contentHint 설정 후 addTrack 
+					if(track.kind === "video") {
+						track.contentHint = "motion"
+					}
 					config.pc.addTrack(track, stream);
 				} else {
 					if(track.kind === "audio") {
@@ -1824,6 +1829,7 @@ function Janus(gatewayCallbacks) {
 					}
 				}
 			});
+			Janus.log(stream.getTracks())
 		}
 		// Any data channel to create?
 		if(isDataEnabled(media) && !config.dataChannel[Janus.dataChanDefaultLabel]) {
@@ -2194,7 +2200,7 @@ function Janus(gatewayCallbacks) {
 							.then(function(stream) {
 								pluginHandle.consentDialog(false);
 								if(isAudioSendEnabled(media) && !media.keepAudio) {
-									navigator.mediaDevices.getUserMedia({ audio: true, video: {width: 1280, height: 720} })
+									navigator.mediaDevices.getUserMedia({ audio: true, video: false })
 									.then(function (audioStream) {
 										stream.addTrack(audioStream.getAudioTracks()[0]);
 										streamsDone(handleId, jsep, media, callbacks, stream);
@@ -2361,7 +2367,7 @@ function Janus(gatewayCallbacks) {
 
 					var gumConstraints = {
 						audio: (audioExist && !media.keepAudio) ? audioSupport : false,
-						video: (videoExist && !media.keepVideo) ? {width: 1280, height: 720} : false
+						video: (videoExist && !media.keepVideo) ? {width: 640, height: 360} : false
 					};
 					Janus.debug("getUserMedia constraints", gumConstraints);
 					if (!gumConstraints.audio && !gumConstraints.video) {
@@ -2387,14 +2393,16 @@ function Janus(gatewayCallbacks) {
 										// height: 360,
 										// width: localStream.getVideoTracks()[0].getSettings().width,
 										// height: localStream.getVideoTracks()[0].getSettings().height,
-										width: 1280,
-										height: 720,
+										width: 640,
+										height: 360,
 										// chromakey: true
+										// fullscreen: true
 									},
 									audio: {
 										mediaType: 'mycam'
 									}
 								})
+								StreamMixer.getStream().getVideoTracks()[0].position = {t:0,l:0,w:100,h:100}
 								streamsDone(handleId, jsep, media, callbacks, StreamMixer.getStream());
 							}).catch(function(error) {
 								pluginHandle.consentDialog(false);

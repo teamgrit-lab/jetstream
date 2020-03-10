@@ -209,8 +209,61 @@ body {
   }
 }
 
+nav {
+  position: sticky;
+  left: 0;
+  right: 0;
+  display: block;
+  box-shadow: 0 1px 6px 0 rgba(0,0,0,.25);
+  padding: 8px 0;
+  text-align: center;
+}
+nav .logo-t { font-size: 18px; font-weight: 700; }
+nav .logo-st { font-size: 11px; }
+
+button.rounded {
+  padding: 0 24px;
+  line-height: 48px;
+  border-radius: 24px;
+  outline: none;
+  border: none;
+}
+
+button.green {
+  background-color: #00B898;
+  color: #fff;
+}
+
+button.green:hover { background-color: #04bd9e; }
+button.green:active { background-color: #07a88d; }
+
+button#start {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+#show-streamurl {
+  padding: 8px;
+}
+
+canvas {
+  width: 640px;
+  height: 360px;
+  display: block;
+  margin: 0 auto;
+}
 
 div#player label.title{
   padding: .5em;
   background: rgba(255, 255, 255, 0.6);
+}
+
+.toast-new {
+  background: rgba(0,0,0,.3);
+  padding: 8px 16px;
+  color: #fff;
+  letter-spacing: -1px;
+  border-radius: 16px;
 }

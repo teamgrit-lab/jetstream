@@ -2,10 +2,10 @@
 <html>
 
 <head>
-	<title>jetstream</title>
+	<title>jetstream v0.0.2</title>
 	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
 	<link rel="stylesheet" type="text/css" href="css/jetstream.css" />
-	<link rel="stylesheet" type="text/css" href="css/comp.switch.css" />
+	<link rel="stylesheet" type="text/css" href="css/components.css" />
 	<!-- Load TensorFlow.js -->
 	<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
 	<!-- Load Posenet -->
@@ -14,11 +14,11 @@
 </head>
 
 <body>
+	<nav href="/">
+		<div class="logo-t">TeamGRIT</div>
+		<div class="logo-st">VideoChat</div>
+	</nav>
 	<div class="container">
-		<a href="/">
-			<img class="nav-element" src="img/jetstream.png" alt="jetstream"></a>
-		<a class="nav-element btn btn--about" href="javascript:;" data-toggle="modal" data-target="#about-modal">What is
-			Jetstream?</a>
 
 
 		<!-- Modal -->
@@ -33,23 +33,7 @@
 						</button>
 					</div>
 					<div class="modal-body">
-						<p>Jetstream is live-streaming for the people. It doesn't sign you up, gather your data, ask for
-							money, or
-							drive engagement metrics. It <i>just works</i>, direct from the browser, with no setup
-							required.</p>
 
-						<p>The video and audio is streamed using <a href="https://webrtc.org/">WebRTC</a> to a <a
-								href="https://janus.conf.meetecho.com/">Janus</a> server that relays the stream to the
-							viewers.</p>
-
-						<p><small>
-								Jetstream is a project by <a href="https://incoherency.co.uk/">James Stanley</a>. Email
-								me at <a href="mailto:james@incoherency.co.uk">james@incoherency.co.uk</a>.<br>
-								Thanks to <a href="https://falkus.co/">Martin Falkus</a> for the page design.<br>
-								Free software, with code <a href="https://github.com/jes/jetstream">on github</a>,
-								including
-								self-hosting instructions.
-							</small></p>
 					</div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -64,10 +48,7 @@
 
 			<div id="prestart">
 				<div class="splash-msg">
-					<h1>Live-streaming without the bullshit:<br />
-						<i>no signup, no accounts, no pricing.</i></h1>
-					<button class="shiny-btn shiny-btn--main" id="start">Start streaming your webcam
-						now&nbsp;&nbsp;&#9654;<i></i></button>
+					<button class="rounded green" id="start">START<i></i></button>
 				</div>
 			</div>
 
@@ -80,13 +61,18 @@
 					</div>
 				</div>
 
-				<div id="show-streamurl" style="display:none">Share this stream URL: <a target="_blank"
-						id="streamurl"></a>
-					<small>(open in a new tab to test the stream)</small></div><br>
-				<span id="slowlink" style="opacity:0;color:red;font-family:monospace">SLOW LINK</span><br>
 				<div id="player" style="display:none">
 					<canvas style="max-width:100%; max-height:100%" id="myvideo"></canvas><br>
 					<!-- <video style="max-width:100%; max-height:100%" id="myvideo" autoplay playsinline muted="muted"></video><br> -->
+					<div id="show-streamurl" style="display:none">
+						Share this stream URL: <a target="_blank" id="streamurl"></a>
+						<small>(open in a new tab to test the stream)</small>
+					</div>
+					<label class="title">Video Resolution: </label><select id="video-res">
+						<option value="1" default>320 x 240</option>
+						<option value="2">640 x 360</option>
+						<option value="3">1280 x 720</option>
+					</select><br>
 					<label class="title">Bitrate limit: </label><select id="bitrate">
 						<option value="0" default>No limit</option>
 						<option value="64">64 kbit/sec</option>
@@ -96,6 +82,7 @@
 						<option value="1024">1 mbit/sec</option>
 						<option value="2048">2 mbit/sec</option>
 					</select><br>
+					<span id="slowlink" class="toast-new" style="opacity:1">SLOW LINK</span>
 					<span id="slowlink-explain" style="display:none">If you're getting lots of <span
 							style="color:red;font-family:monospace">SLOW LINK</span> warnings, your stream will be
 						stuttering.
