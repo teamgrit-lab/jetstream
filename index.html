@@ -2,7 +2,7 @@
 <html>
 
 <head>
-	<title>jetstream v0.0.2</title>
+	<title>Teamgrit VideoStreaming with FaceDetection</title>
 	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
 	<link rel="stylesheet" type="text/css" href="css/jetstream.css" />
 	<link rel="stylesheet" type="text/css" href="css/components.css" />
@@ -16,32 +16,9 @@
 <body>
 	<nav href="/">
 		<div class="logo-t">TeamGRIT</div>
-		<div class="logo-st">VideoChat</div>
+		<div class="logo-st">Video Streaming with Face Detection</div>
 	</nav>
 	<div class="container">
-
-
-		<!-- Modal -->
-		<div class="modal fade" id="about-modal" tabindex="-1" role="dialog" aria-labelledby="aboutModal"
-			aria-hidden="true">
-			<div class="modal-dialog" role="document">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title" id="exampleModalLabel">About jetstream</h5>
-						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-							<span aria-hidden="true">&times;</span>
-						</button>
-					</div>
-					<div class="modal-body">
-
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-					</div>
-				</div>
-			</div>
-		</div>
-
 		<div class="clearfix"></div>
 
 		<div id="publisher" style="display:none">
@@ -64,34 +41,194 @@
 				<div id="player" style="display:none">
 					<canvas style="max-width:100%; max-height:100%" id="myvideo"></canvas><br>
 					<!-- <video style="max-width:100%; max-height:100%" id="myvideo" autoplay playsinline muted="muted"></video><br> -->
+					<div class="position-absolute container" style="top:0; right: 0; width: 320px; margin-top: 8px; background: #fff">
+						<div class="row border-bottom py-1">
+							<div class="col-sm-5">
+								<label class="title"><small>Video Resolution</small></label>
+							</div>
+							<div class="col-sm-7">
+								<select class="form-control form-control-sm" id="video-res">
+									<option value="1">320 x 240</option>
+									<option value="2" default>640 x 360</option>
+									<option value="3">1280 x 720</option>
+								</select>
+							</div>
+						</div>
+						<div class="row border-bottom py-1 mb-md-3">
+							<div class="col-sm-5">
+								<label class="title"><small>Bitrate limit</small></label>
+							</div>
+							<div class="col-sm-7">
+								<select class="form-control form-control-sm" id="bitrate">
+									<option value="0" default>No limit</option>
+									<option value="64">64 kbit/sec</option>
+									<option value="128">128 kbit/sec</option>
+									<option value="256">256 kbit/sec</option>
+									<option value="512">512 kbit/sec</option>
+									<option value="1024">1 mbit/sec</option>
+									<option value="2048">2 mbit/sec</option>
+								</select>
+							</div>
+						</div>
+						<div class="row border-top border-bottom py-1">
+							<div class="col-sm-5">
+								<small>Face Detection</small>
+							</div>
+							<div class="col-sm-7">
+								<div class="custom-control custom-switch">
+									<input type="checkbox"
+										class="custom-control-input"
+										id="switch-posenet"
+										data-toggle="collapse"
+										data-target="#fd-controller"
+										aria-expanded="false"
+										aria-controls="fd-controller">
+									<label class="custom-control-label text-sm"
+										for="switch-posenet">
+									</label>
+								</div>
+							</div>
+						</div>
+						<div class="collapse row" id="fd-controller">
+							<div class="container">
+								<div class="row py-sm-1">
+									<div class="col-sm-5"><label class="title"><small>method</small></label></div>
+									<div class="col-sm-7">
+										<select class="form-control form-control-sm" id="fd-method">
+											<option value="single-person" selected>single-pose</option>
+											<option value="multi-person">multi-pose</option>
+										</select>
+									</div>
+								</div>
+								<div class="row py-1 border-top border-bottom" style="background: #fff">
+									<div class="col-sm">
+										<small>Input</small>
+									</div>
+								</div>
+								<div class="row pt-1">
+									<div class="col-sm-5"><label class="title"><small>architecture</small></label></div>
+									<div class="col-sm-7">
+										<select class="form-control form-control-sm" id="fd-architecture">
+											<option value="MobileNetV1" selected>MobileNetV1</option>
+											<option value="ResNet50">ResNet50</option>
+										</select>
+									</div>
+								</div>
+								<div class="row pt-1">
+									<div class="col-sm-5"><label class="title"><small>inputResolution</small></label></div>
+									<div class="col-sm-7">
+										<select class="form-control form-control-sm" id="fd-input-res">
+											<option value="250">250</option>
+											<option value="500" selected>500</option>
+											<option value="700">700</option>
+										</select>
+									</div>
+								</div>
+								<div class="row pt-1">
+									<div class="col-sm-5"><label class="title"><small>outputStride</small></label></div>
+									<div class="col-sm-7">
+										<select class="form-control form-control-sm" id="fd-output-stride">
+											<option value="8">8</option>
+											<option value="16" selected>16</option>
+										</select>
+									</div>
+								</div>
+								<div class="row pt-1">
+									<div class="col-sm-5"><label class="title"><small>multiplier</small></label></div>
+									<div class="col-sm-7">
+										<select class="form-control form-control-sm" id="fd-multiplier">
+											<option value="1">1</option>
+											<option value="0.75" selected>0.75</option>
+											<option value="0.5">0.5</option>
+										</select>
+									</div>
+								</div>
+								<div class="row pt-1">
+									<div class="col-sm-5"><label class="title"><small>quantBytes</small></label></div>
+									<div class="col-sm-7">
+										<select class="form-control form-control-sm" id="fd-quant-bytes">
+											<option value="1">1</option>
+											<option value="2" selected>2</option>
+											<option value="4">4</option>
+										</select>
+									</div>
+								</div>
+
+								<div class="row py-1 border-top border-bottom" style="background: #fff">
+									<div class="col-sm">
+										<small>Pose Detection</small>
+									</div>
+								</div>
+								<div class="row pt-1">
+									<div class="col-sm-5"><label class="title">
+										<small>maxPoseDetections</small></label>
+									</div>
+									<div class="col-sm-5">
+										<input type="range" class="custom-range" min="1" max="20" step="1" id="fd-max-pose-detect" disabled>
+									</div>
+									<div class="col-sm-2">
+										<small><label class="value">5</label></small>
+									</div>
+								</div>
+								<div class="row pt-1">
+									<div class="col-sm-5">
+										<label class="title"><small>minPoseConfidence</small></label>
+									</div>
+									<div class="col-sm-5">
+										<input type="range" class="custom-range" min="0" max="1" step="0.01" value="0.1" id="fd-min-pose-conf">
+									</div>
+									<div class="col-sm-2">
+										<small><label class="value">0.1</label></small>
+									</div>
+								</div>
+								<div class="row pt-1">
+									<div class="col-sm-5"><label class="title"><small>minPartConfidence</small></label></div>
+									<div class="col-sm-5">
+										<input type="range" class="custom-range" min="0" max="1" step="0.01" value="0.5" id="fd-min-part-conf">
+									</div>
+									<div class="col-sm-2">
+										<small><label class="value">0.5</label></small>
+									</div>
+								</div>
+								<div class="row pt-1">
+									<div class="col-sm-5"><label class="title"><small>nmsRadius</small></label></div>
+									<div class="col-sm-5">
+										<input type="range" class="custom-range" min="0" max="40" step="1" value="30" id="fd-nms-radius" disabled>
+									</div>
+									<div class="col-sm-2">
+										<small><label class="value">30</label></small>
+									</div>
+								</div>
+
+								<div class="row py-1 border-top border-bottom" style="background: #fff">
+									<div class="col-sm">
+										<small>Output</small>
+									</div>
+								</div>
+								<div class="row pt-1">
+									<div class="col-sm-5"><label class="title">
+										<small>FaceOnly</small></label>
+									</div>
+									<div class="col-sm-7">
+										<div class="custom-control custom-checkbox">
+											<input type="checkbox" class="custom-control-input" id="fd-opt-face" checked>
+											<label class="custom-control-label" for="fd-opt-face"></label>
+										  </div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
 					<div id="show-streamurl" style="display:none">
-						Share this stream URL: <a target="_blank" id="streamurl"></a>
+						Share URL: <a target="_blank" id="streamurl"></a>
 						<small>(open in a new tab to test the stream)</small>
 					</div>
-					<label class="title">Video Resolution: </label><select id="video-res">
-						<option value="1" default>320 x 240</option>
-						<option value="2">640 x 360</option>
-						<option value="3">1280 x 720</option>
-					</select><br>
-					<label class="title">Bitrate limit: </label><select id="bitrate">
-						<option value="0" default>No limit</option>
-						<option value="64">64 kbit/sec</option>
-						<option value="128">128 kbit/sec</option>
-						<option value="256">256 kbit/sec</option>
-						<option value="512">512 kbit/sec</option>
-						<option value="1024">1 mbit/sec</option>
-						<option value="2048">2 mbit/sec</option>
-					</select><br>
 					<span id="slowlink" class="toast-new" style="opacity:1">SLOW LINK</span>
 					<span id="slowlink-explain" style="display:none">If you're getting lots of <span
 							style="color:red;font-family:monospace">SLOW LINK</span> warnings, your stream will be
 						stuttering.
 						You could try lowering the bitrate limit.</span>
 
-					<label class="title">Face On/Off: </label><label for="switch-posenet" class="switch">
-						<input type="checkbox" id="switch-posenet">
-						<span class="slider"></span>
-					</label>
 				</div>
 			</div>
 		</div>
@@ -105,9 +242,10 @@
 
 	<script type="text/javascript" src="js/jquery-3.3.1.min.js"></script>
 	<script type="text/javascript" src="js/bootstrap.min.js"></script>
-	<script type="text/javascript" src="js/adapter.min.js"></script>
+	<script type="text/javascript" src="js/adapter-latest.js"></script>
 	<script type="text/javascript" src="js/janus.js"></script>
 	<script type="text/javascript" src="js/jetstream.js"></script>
+	<script type="text/javascript" src="js/facedetect.js"></script>
 	<script type="text/javascript" src="js/stream-mixer.min.js"></script>
 
 </body>

@@ -59,3 +59,16 @@
     -webkit-transition: .4s;
     transition: .4s;
   }
+
+  .form-control-sm {
+    height: calc(1.25em + .25rem + 2px);
+    padding: .125rem .25rem;
+    font-size: .75rem;
+    line-height: 1.25;
+    border-radius: .2rem;
+  }
+
+  label {
+    margin-bottom: .25rem;
+    line-height: 1;
+  }

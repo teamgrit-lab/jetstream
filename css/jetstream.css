@@ -251,13 +251,10 @@ button#start {
 canvas {
   width: 640px;
   height: 360px;
-  display: block;
-  margin: 0 auto;
 }
-
-div#player label.title{
+div#player {
+  position: relative;
   padding: .5em;
-  background: rgba(255, 255, 255, 0.6);
 }
 
 .toast-new {
@@ -266,4 +263,8 @@ div#player label.title{
   color: #fff;
   letter-spacing: -1px;
   border-radius: 16px;
+}
+
+#fd-controller {
+  background: #f5f5f5;
 }
