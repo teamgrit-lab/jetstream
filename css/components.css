@@ -72,3 +72,17 @@
     margin-bottom: .25rem;
     line-height: 1;
   }
+
+  button.btn-green {
+    background-color: #00B898;
+    border-color: #00B898;
+    color: #fff;
+  }
+  button.btn-green:hover {
+    background-color: #04bd9e !important;
+    border-color: #04bd9e !important;
+  }
+button.btn-green:active {
+  background-color: #07a88d !important;
+  border-color: #07a88d !important;
+}

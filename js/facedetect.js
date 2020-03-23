@@ -177,7 +177,6 @@ function stopPoseNet() {
 
 async function loadPoseNet() {
     let poses = [];
-
     if(!flagPoseNet) {
         posenet_canvasCtx.clearRect(0,0,posenet_canvasCtx.width, posenet_canvasCtx.height)
         StreamMixer.clearPoints();

@@ -2,9 +2,11 @@
 let janus = null;
 let sfutest = null;
 let remoteFeed = null;
+let roomList = null;
 let myroom = null;
 let server = null;
 let slowlinks = 0;
+let tID_roomRefresh = null;
 
 if (window.location.protocol === 'http:')
     server = "http://" + window.location.hostname + ":8088/janus";
@@ -13,67 +15,42 @@ else
 
 $(document).ready(async function () {
     Janus.init({
-        debug: "all", callback: function () {
+        debug: "all", callback: async function () {
             if (!Janus.isWebrtcSupported()) {
                 alert("No WebRTC support???");
                 return;
             }
+            janus = await createJanusInstance();
+
             if (window.location.hash) {
-                try {
-                    let joinroom = parseInt(window.location.hash.substr(1));
-                    console.log(joinroom)
-                    myroom = joinroom;
-                    init_subscriber(joinroom);
-                } catch (err) {
-                    console.log(err);
-                    init_publisher();
-                };
+                let roomID = parseInt(window.location.hash.substr(1));
+                startSubscriber(roomID)
             } else {
-                init_publisher();
+                await VideoRoom.attachDefault(janus)
+            
+                checkLastCreateRoom();
+    
+                VideoRoom.list( (list) => {
+                    roomList = list;
+                    
+                    list.forEach( (room) => {
+                        $('#room-list').append(`
+                            <li class="li-room list-group-item list-group-item-action"
+                                room-id="${room.room}">${room.description}</li>
+                        `)
+                    })
+    
+                    bindEventHandler();
+    
+                })
             }
         }
     });
 });
 
-function init_subscriber(joinroom) {
-    $('#subscriber').show();
-    $('#substatus').text("Connecting...");
-
-    janus = new Janus({
-        server: server,
-        // server: "wss://sig0.cojam.tv/enter_room/websocket",
-        iceServers: [
-            { urls: 'stun:stun.l.google.com:19302' },
-            {
-                urls: ['turn:13.209.250.18:3478?transport=udp'],
-                username: 'kurento',
-                credential: 'kurento'
-            }
-        ],
-        success: function () {
-            $('#substatus').text("Joining stream...");
-            start_subscribing(joinroom);
-        },
-        error: function (error) {
-            alert(error);
-            // window.location.reload();
-        },
-        destroyed: function () {
-            // window.location.reload();
-        },
-    });
-}
-
-function init_publisher() {
-    $('#publisher').show();
-
-    $('#start').one('click', async function () {
-        await StreamMixer.init({elementID: 'myvideo', width: 640, height: 360});
-
-        $('#prestart').hide();
-        $('#poststart').show();
-
-        janus = new Janus({
+function createJanusInstance() {
+    return new Promise((resolve, reject) => {
+        const ret = new Janus({
             server: server,
             // server: "wss://sig0.cojam.tv/enter_room/websocket",
             iceServers: [
@@ -85,7 +62,8 @@ function init_publisher() {
                 }
             ],
             success: function () {
-                start_publishing();
+                resolve(ret);
+                // attach();
             },
             error: function (error) {
                 alert(error);
@@ -95,7 +73,106 @@ function init_publisher() {
                 // window.location.reload();
             },
         });
+    })
+}
+
+function bindEventHandler() {
+    $('#btn-create-room').click(() => {
+        const description = $('#room-desc').val();
+        if(description.length < 2) {
+            alert("방 제목은 2자 이상 가능합니다");
+            return;
+        }
+
+        // 방만들기전에 기존의 방이 있으면 삭제하고 진행       
+        const roomInfo = VideoRoom.restoreRoomInfo();
+        if(roomInfo) {
+            const { id, secret } = roomInfo;
+            VideoRoom.destroy(id, secret, ()=>{
+                VideoRoom.create({description, callback: (roomID) => {
+                    startPublisher(roomID);
+                }})
+            })
+        } else {
+            VideoRoom.create({description, callback: (roomID) => {
+                startPublisher(roomID);
+            }})
+        }
     });
+
+    $(".li-room").click((e) => {
+        const roomID = parseInt($(e.currentTarget).attr('room-id'));
+        location.href = `#${roomID}`
+        startSubscriber(roomID)
+    });
+
+    window.addEventListener('beforeunload', function(event) {
+        // VideoRoom.clearRoomInfo();
+    });
+}
+
+// localStorage에 방정보(key=createroom)가 남아있는지 체크
+function checkLastCreateRoom() {
+    const roomInfo = VideoRoom.restoreRoomInfo();
+    if(roomInfo) {
+        const { id, secret } = roomInfo;
+        UI_showReconnectButton(id);
+    }
+}
+
+
+// subscriber
+function startSubscriber(roomID) {
+    initUI_subscriber();
+    VideoRoom.attachSubscriber({
+        roomID,
+        onremotestream: subscriber_handle_remotestream
+    })
+}
+
+function initUI_subscriber() {
+    $('#lobby').hide();
+
+    $('#subscriber').show();
+    $('#substatus').text("Connecting...");
+
+    $('#substatus').text("Joining stream...");
+}
+
+
+// publisher
+function startPublisher(roomID) {
+    console.log("start pub")
+    initUI_Publisher(roomID);
+
+    VideoRoom.attachPublisher({
+        roomID,
+        success: () => {
+            VideoRoom.storeRoomInfo();
+            tID_roomRefresh = setInterval(VideoRoom.storeRoomInfo, 15*1000) // 15sec
+        },
+        onmessage: {
+            joined: UI_showPlayer,
+            slowlink: UI_slowLink
+        },
+        onlocalstream: initPoseNet
+    });
+}
+
+async function initUI_Publisher(roomID) {
+    $('#publisher').show();
+    
+    let url = window.location.origin + window.location.pathname + '#' + roomID;
+    $('#loading').hide();
+    $('#streamurl').text(url);
+    $('#streamurl').attr('href', url);
+    $('#show-streamurl').show();
+
+
+    await StreamMixer.init({elementID: 'myvideo', width: 640, height: 360});
+
+    $('#lobby').hide();
+    $('#poststart').show();
 
     $('#video-res').val(2);
     $('#video-res').change(function () {
@@ -119,9 +196,7 @@ function init_publisher() {
 
     $('#bitrate').val(0);
     $('#bitrate').change(function () {
-        if (sfutest == null)
-            return;
-        sfutest.send({ message: { request: "configure", bitrate: parseInt($(this).val()) * 1000 } });
+        VideoRoom.changeBitrate( parseInt($(this).val()) * 1000 )
     });
 
     $('#switch-posenet').val(0);
@@ -137,138 +212,39 @@ function init_publisher() {
     })
 }
 
-function start_subscribing(joinroom) {
-    janus.attach({
-        plugin: "janus.plugin.videoroom",
-        success: function (pluginHandle) {
-            remoteFeed = pluginHandle;
-            remoteFeed.send({
-                message: { request: "listparticipants", "room": joinroom },
-                success: function (msg) {
-                    if (msg["videoroom"] == "participants" && msg["participants"].length > 0) {
-                        remoteFeed.send({ message: { "request": "join", "room": joinroom, "ptype": "subscriber", "feed": msg["participants"][0].id } });
-                    } else {
-                        // reload in 5 seconds
-                        // TODO: something better?
-                        // window.setTimeout(function() { window.location.reload(); }, 5000);
-                    }
-                },
-            });
-        },
-        error: function (error) {
-            alert(error);
-        },
-        onmessage: function (msg, jsep) {
-            if (msg["videoroom"] !== undefined && msg["videoroom"] !== null)
-                subscriber_handle_msg(msg);
-            if (jsep !== undefined && jsep !== null)
-                subscriber_handle_jsep(jsep);
-        },
-        webrtcState: function (on) {
-            console.log("Janus says our WebRTC PeerConnection is " + (on ? "up" : "down") + " now");
-        },
-        onlocalstream: function (stream) {
-            // do nothing
-        },
-        onremotestream: function (stream) {
-            console.log(stream)
-            subscriber_handle_remotestream(stream);
-        },
-        oncleanup: function () {
-            // do what now?
-            // window.location.reload();
-        },
+function UI_showReconnectButton(roomID) {
+    console.log(roomID)
+    $('#lobby .row:first-of-type').after(`
+        <div class="row py-1 justify-content-center">
+            <div class="form-group px-2">
+                <small>이전에 진행하던 방송이 있습니다. 재연결 하시겠습니까?</small>
+            </div>
+            <div class="form-group">
+                <button class="btn-sm btn-outline-secondary" id="btn-reconnect">재접속</button>
+            </div>
+        </div>
+    `)
+
+    $('#btn-reconnect').click( () => {
+        startPublisher(roomID);
     });
 }
 
-function start_publishing() {
-    janus.attach({
-        plugin: "janus.plugin.videoroom",
-        success: function (pluginHandle) {
-            sfutest = pluginHandle;
-            sfutest.send({
-                message: {
-                    request: "create",
-                    permanent: false,
-                    videocodec: "h264",
-                    record: true,
-                    rec_dir: "/tmp",
-                    secret: Janus.randomString(12),
-                    is_private: true
-                },
-                success: function (msg) {
-                    console.log(msg)
-                    myroom = msg["room"];
-                    let url = window.location.origin + window.location.pathname + '#' + myroom;
-                    $('#loading').hide();
-                    $('#streamurl').text(url);
-                    $('#streamurl').attr('href', url);
-                    $('#show-streamurl').show();
-                    sfutest.send({
-                        message: { "request": "join", "room": myroom, "ptype": "publisher" },
-                    });
-                },
-            });
-        },
-        error: function (error) {
-            alert(error);
-        },
-        consentDialog: function (on) {
-            // TODO: do we need to do anything here? This function gets called to tell
-            // us whether the video/audio consent dialog is currently up
-        },
-        mediaState: function (medium, on) {
-            console.log("Janus " + (on ? "started" : "stopped") + " receiving our " + medium);
-        },
-        webrtcState: function (on) {
-            console.log("Janus says our WebRTC PeerConnection is " + (on ? "up" : "down") + " now");
-        },
-        onmessage: function (msg, jsep) {
-            if (msg["videoroom"] !== undefined && msg["videoroom"] !== null)
-                publisher_handle_msg(msg);
-            if (jsep !== undefined && jsep !== null)
-                publisher_handle_jsep(jsep);
-        },
-        onlocalstream: function (stream) {
-            initPoseNet();
-            publisher_handle_localstream(stream);
-        },
-        onremotestream: function (stream) {
-            // do nothing
-        },
-        oncleanup: function () {
-            // do what now?
-            // window.location.reload();
-        },
-    });
+
+function UI_showPlayer(msg) {
+    console.log('show player')
+    $('#player').show();
 }
 
-function publisher_handle_msg(msg) {
+function UI_slowLink(msg) {
     // TODO: this
-    console.log("msg:");
-    console.log(msg);
-
-    if (msg["videoroom"] == "joined") {
-        publishOwnFeed();
+    $('#slowlink').css('opacity', '1.0');
+    $('#slowlink').animate({
+        opacity: 0,
+    }, 2000);
+    if (++slowlinks >= 3) {
+        $('#slowlink-explain').show();
     }
-
-    if (msg["videoroom"] == "slow_link") {
-        $('#slowlink').css('opacity', '1.0');
-        $('#slowlink').animate({
-            opacity: 0,
-        }, 2000);
-        if (++slowlinks >= 3) {
-            $('#slowlink-explain').show();
-        }
-    }
-}
-
-function publisher_handle_jsep(jsep) {
-    // TODO: this
-    console.log("jsep:");
-    console.log(jsep);
-
-    sfutest.handleRemoteJsep({ jsep: jsep });
 }
 
 async function publisher_handle_localstream(stream) {
@@ -305,37 +281,7 @@ function publishOwnFeed() {
     });
 }
 
-function subscriber_handle_msg(msg) {
-    // TODO: this
-    console.log("msg:");
-    console.log(msg);
 
-    if (msg["videoroom"] == "event") {
-        if (msg["error_code"] == 428) { // no such feed
-            // publisher isn't here yet, so reload the page
-            // window.setTimeout(function() {
-            //     window.location.reload();
-            // }, 1000);
-        }
-    }
-}
-
-function subscriber_handle_jsep(jsep) {
-    // TODO: this
-    console.log("jsep:");
-    console.log(jsep);
-
-    remoteFeed.createAnswer({
-        jsep: jsep,
-        media: { audioSend: false, videoSend: false },
-        success: function (jsep) {
-            remoteFeed.send({ "message": { "request": "start", "room": myroom }, "jsep": jsep });
-        },
-        error: function (error) {
-            alert(error);
-        },
-    });
-}
 
 function subscriber_handle_remotestream(stream) {
     console.log("subscribe", stream)

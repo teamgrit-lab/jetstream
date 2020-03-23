@@ -1,10 +1,3 @@
-body {
-    background: url('../img/jet-plane-tail-and-sky.jpg') no-repeat center bottom fixed; 
-    -webkit-background-size: cover;
-       -moz-background-size: cover;
-         -o-background-size: cover;
-            background-size: cover;
-}
 
 .nav-element {
     display: inline-block;
@@ -227,21 +220,6 @@ button.rounded {
   border-radius: 24px;
   outline: none;
   border: none;
-}
-
-button.green {
-  background-color: #00B898;
-  color: #fff;
-}
-
-button.green:hover { background-color: #04bd9e; }
-button.green:active { background-color: #07a88d; }
-
-button#start {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
 }
 
 #show-streamurl {

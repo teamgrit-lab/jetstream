@@ -1346,7 +1346,6 @@ function Janus(gatewayCallbacks) {
 			withCredentials: withCredentials,
 			body: request,
 			success: function(json) {
-				console.log(request)
 				Janus.debug("Message sent!");
 				Janus.debug(json);
 				if(json["janus"] === "success") {
@@ -2367,7 +2366,7 @@ function Janus(gatewayCallbacks) {
 
 					var gumConstraints = {
 						audio: (audioExist && !media.keepAudio) ? audioSupport : false,
-						video: (videoExist && !media.keepVideo) ? {width: 640, height: 360} : false
+						video: (videoExist && !media.keepVideo) ? {width: 1280, height: 720} : false
 					};
 					Janus.debug("getUserMedia constraints", gumConstraints);
 					if (!gumConstraints.audio && !gumConstraints.video) {

@@ -1,4 +1,5 @@
 <!doctype html>
+<meta charset="utf-8">
 <html>
 
 <head>
@@ -21,11 +22,25 @@
 	<div class="container">
 		<div class="clearfix"></div>
 
+		<div class="container align-items-center mt-4 pd-4" id="lobby">
+			<div class="row py-1 justify-content-center">
+				<div class="form-group px-2">
+					<input class="form-control" id="room-desc">
+				</div>
+				<div class="form-group">
+					<button class="btn btn-green" id="btn-create-room">방생성</button>
+				</div>
+			</div>
+			<div class="row py-1 justify-content-center mt-4">
+				<ul class="list-group" id="room-list"></ul>
+			</div>
+		</div>
+
 		<div id="publisher" style="display:none">
 
 			<div id="prestart">
 				<div class="splash-msg">
-					<button class="rounded green" id="start">START<i></i></button>
+
 				</div>
 			</div>
 
@@ -244,6 +259,7 @@
 	<script type="text/javascript" src="js/bootstrap.min.js"></script>
 	<script type="text/javascript" src="js/adapter-latest.js"></script>
 	<script type="text/javascript" src="js/janus.js"></script>
+	<script type="text/javascript" src="js/videoroom.js"></script>
 	<script type="text/javascript" src="js/jetstream.js"></script>
 	<script type="text/javascript" src="js/facedetect.js"></script>
 	<script type="text/javascript" src="js/stream-mixer.min.js"></script>
