@@ -1,5 +1,6 @@
 <!doctype html>
 <meta charset="utf-8">
+<META HTTP-EQUIV="Cache-Control" CONTENT="no-cache">
 <html>
 
 <head>
@@ -15,243 +16,388 @@
 </head>
 
 <body>
-	<nav href="/">
+	<nav class="border-bottom" href="/">
 		<div class="logo-t">TeamGRIT</div>
 		<div class="logo-st">Video Streaming with Face Detection</div>
-	</nav>
-	<div class="container">
-		<div class="clearfix"></div>
-
-		<div class="container align-items-center mt-4 pd-4" id="lobby">
-			<div class="row py-1 justify-content-center">
-				<div class="form-group px-2">
-					<input class="form-control" id="room-desc">
+		<div class="container" style="display: none">
+			<div class="row px-5">
+				<div class="col-sm-1 offset-sm-3">
+					<button class="btn btn-outline-secondary" title="FaceDetection">
+						<img src="" alt="F">
+					</button>
 				</div>
-				<div class="form-group">
-					<button class="btn btn-green" id="btn-create-room">방생성</button>
+				<div class="col-sm-1">
+					<button class="btn btn-outline-secondary" title="Settings">
+						<img src="" alt="S">
+					</button>
 				</div>
-			</div>
-			<div class="row py-1 justify-content-center mt-4">
-				<ul class="list-group" id="room-list"></ul>
 			</div>
 		</div>
+	</nav>
 
-		<div id="publisher" style="display:none">
+	
+	<div class="container-fluid h-100" style="background:#efefef">
+		<div class="clearfix"></div>
 
-			<div id="prestart">
-				<div class="splash-msg">
-
-				</div>
-			</div>
-
-			<div id="poststart" style="display:none">
-				<div id="loading">
-					<div class="splash-msg">
-						<h1>Getting ready for lift-off...<br /><i>Please wait a few seconds whilst we establish a
-								connection.</i>
-						</h1>
-					</div>
-				</div>
-
-				<div id="player" style="display:none">
-					<canvas style="max-width:100%; max-height:100%" id="myvideo"></canvas><br>
-					<!-- <video style="max-width:100%; max-height:100%" id="myvideo" autoplay playsinline muted="muted"></video><br> -->
-					<div class="position-absolute container" style="top:0; right: 0; width: 320px; margin-top: 8px; background: #fff">
-						<div class="row border-bottom py-1">
-							<div class="col-sm-5">
-								<label class="title"><small>Video Resolution</small></label>
-							</div>
-							<div class="col-sm-7">
-								<select class="form-control form-control-sm" id="video-res">
-									<option value="1">320 x 240</option>
-									<option value="2" default>640 x 360</option>
-									<option value="3">1280 x 720</option>
-								</select>
-							</div>
-						</div>
-						<div class="row border-bottom py-1 mb-md-3">
-							<div class="col-sm-5">
-								<label class="title"><small>Bitrate limit</small></label>
-							</div>
-							<div class="col-sm-7">
-								<select class="form-control form-control-sm" id="bitrate">
-									<option value="0" default>No limit</option>
-									<option value="64">64 kbit/sec</option>
-									<option value="128">128 kbit/sec</option>
-									<option value="256">256 kbit/sec</option>
-									<option value="512">512 kbit/sec</option>
-									<option value="1024">1 mbit/sec</option>
-									<option value="2048">2 mbit/sec</option>
-								</select>
-							</div>
-						</div>
-						<div class="row border-top border-bottom py-1">
-							<div class="col-sm-5">
-								<small>Face Detection</small>
-							</div>
-							<div class="col-sm-7">
-								<div class="custom-control custom-switch">
-									<input type="checkbox"
-										class="custom-control-input"
-										id="switch-posenet"
-										data-toggle="collapse"
-										data-target="#fd-controller"
-										aria-expanded="false"
-										aria-controls="fd-controller">
-									<label class="custom-control-label text-sm"
-										for="switch-posenet">
+		<div class="row h-100" id="input-name-container" style="display:none;background:#fff">
+			<div class="container shadow-sm border p-3 my-5 bg-white rounded" style="max-width: 420px">
+				<div class="row justify-content-center mb-3">
+					<div class="col-sm-auto px-0" id="controls">
+						<div class="container btn-group" data-toggle="buttons">
+							<div class="btn-group-vertical btn-group-toggle" data-toggle="buttons">
+								<div class="btn-group">
+									<label class="btn btn-profile-icon active" data-index="1">
+										<img src="img/profile/1.png">
+										<input type="radio" name="avatar" value="1" autocomplete="off" checked>
+									</label>
+									<label class="btn btn-profile-icon" data-index="2">
+										<img src="img/profile/2.png">
+										<input type="radio" name="avatar" value="2" autocomplete="off">
+									</label>
+									<label class="btn btn-profile-icon" data-index="3">
+										<img src="img/profile/3.png">
+										<input type="radio" name="avatar" value="3" autocomplete="off">
+									</label>
+									<label class="btn btn-profile-icon" data-index="4">
+										<img src="img/profile/4.png">
+										<input type="radio" name="avatar" value="4" autocomplete="off">
+									</label>
+								</div>
+								<div class="btn-group">
+									<label class="btn btn-profile-icon" data-index="5">
+										<img src="img/profile/5.png">
+										<input type="radio" name="avatar" value="5" autocomplete="off">
+									</label>
+									<label class="btn btn-profile-icon" data-index="6">
+										<img src="img/profile/6.png">
+										<input type="radio" name="avatar" value="6" autocomplete="off">
+									</label>
+									<label class="btn btn-profile-icon" data-index="7">
+										<img src="img/profile/7.png">
+										<input type="radio" name="avatar" value="7" autocomplete="off">
+									</label>
+									<label class="btn btn-profile-icon" data-index="8">
+										<img src="img/profile/8.png">
+										<input type="radio" name="avatar" value="8" autocomplete="off">
 									</label>
 								</div>
 							</div>
 						</div>
-						<div class="collapse row" id="fd-controller">
-							<div class="container">
-								<div class="row py-sm-1">
-									<div class="col-sm-5"><label class="title"><small>method</small></label></div>
-									<div class="col-sm-7">
-										<select class="form-control form-control-sm" id="fd-method">
-											<option value="single-person" selected>single-pose</option>
-											<option value="multi-person">multi-pose</option>
-										</select>
-									</div>
-								</div>
-								<div class="row py-1 border-top border-bottom" style="background: #fff">
-									<div class="col-sm">
-										<small>Input</small>
-									</div>
-								</div>
-								<div class="row pt-1">
-									<div class="col-sm-5"><label class="title"><small>architecture</small></label></div>
-									<div class="col-sm-7">
-										<select class="form-control form-control-sm" id="fd-architecture">
-											<option value="MobileNetV1" selected>MobileNetV1</option>
-											<option value="ResNet50">ResNet50</option>
-										</select>
-									</div>
-								</div>
-								<div class="row pt-1">
-									<div class="col-sm-5"><label class="title"><small>inputResolution</small></label></div>
-									<div class="col-sm-7">
-										<select class="form-control form-control-sm" id="fd-input-res">
-											<option value="250">250</option>
-											<option value="500" selected>500</option>
-											<option value="700">700</option>
-										</select>
-									</div>
-								</div>
-								<div class="row pt-1">
-									<div class="col-sm-5"><label class="title"><small>outputStride</small></label></div>
-									<div class="col-sm-7">
-										<select class="form-control form-control-sm" id="fd-output-stride">
-											<option value="8">8</option>
-											<option value="16" selected>16</option>
-										</select>
-									</div>
-								</div>
-								<div class="row pt-1">
-									<div class="col-sm-5"><label class="title"><small>multiplier</small></label></div>
-									<div class="col-sm-7">
-										<select class="form-control form-control-sm" id="fd-multiplier">
-											<option value="1">1</option>
-											<option value="0.75" selected>0.75</option>
-											<option value="0.5">0.5</option>
-										</select>
-									</div>
-								</div>
-								<div class="row pt-1">
-									<div class="col-sm-5"><label class="title"><small>quantBytes</small></label></div>
-									<div class="col-sm-7">
-										<select class="form-control form-control-sm" id="fd-quant-bytes">
-											<option value="1">1</option>
-											<option value="2" selected>2</option>
-											<option value="4">4</option>
-										</select>
-									</div>
-								</div>
-
-								<div class="row py-1 border-top border-bottom" style="background: #fff">
-									<div class="col-sm">
-										<small>Pose Detection</small>
-									</div>
-								</div>
-								<div class="row pt-1">
-									<div class="col-sm-5"><label class="title">
-										<small>maxPoseDetections</small></label>
-									</div>
-									<div class="col-sm-5">
-										<input type="range" class="custom-range" min="1" max="20" step="1" id="fd-max-pose-detect" disabled>
-									</div>
-									<div class="col-sm-2">
-										<small><label class="value">5</label></small>
-									</div>
-								</div>
-								<div class="row pt-1">
-									<div class="col-sm-5">
-										<label class="title"><small>minPoseConfidence</small></label>
-									</div>
-									<div class="col-sm-5">
-										<input type="range" class="custom-range" min="0" max="1" step="0.01" value="0.1" id="fd-min-pose-conf">
-									</div>
-									<div class="col-sm-2">
-										<small><label class="value">0.1</label></small>
-									</div>
-								</div>
-								<div class="row pt-1">
-									<div class="col-sm-5"><label class="title"><small>minPartConfidence</small></label></div>
-									<div class="col-sm-5">
-										<input type="range" class="custom-range" min="0" max="1" step="0.01" value="0.5" id="fd-min-part-conf">
-									</div>
-									<div class="col-sm-2">
-										<small><label class="value">0.5</label></small>
-									</div>
-								</div>
-								<div class="row pt-1">
-									<div class="col-sm-5"><label class="title"><small>nmsRadius</small></label></div>
-									<div class="col-sm-5">
-										<input type="range" class="custom-range" min="0" max="40" step="1" value="30" id="fd-nms-radius" disabled>
-									</div>
-									<div class="col-sm-2">
-										<small><label class="value">30</label></small>
-									</div>
-								</div>
-
-								<div class="row py-1 border-top border-bottom" style="background: #fff">
-									<div class="col-sm">
-										<small>Output</small>
-									</div>
-								</div>
-								<div class="row pt-1">
-									<div class="col-sm-5"><label class="title">
-										<small>FaceOnly</small></label>
-									</div>
-									<div class="col-sm-7">
-										<div class="custom-control custom-checkbox">
-											<input type="checkbox" class="custom-control-input" id="fd-opt-face" checked>
-											<label class="custom-control-label" for="fd-opt-face"></label>
-										  </div>
-									</div>
-								</div>
-							</div>
-						</div>
 					</div>
-					<div id="show-streamurl" style="display:none">
-						Share URL: <a target="_blank" id="streamurl"></a>
-						<small>(open in a new tab to test the stream)</small>
-					</div>
-					<span id="slowlink" class="toast-new" style="opacity:1">SLOW LINK</span>
-					<span id="slowlink-explain" style="display:none">If you're getting lots of <span
-							style="color:red;font-family:monospace">SLOW LINK</span> warnings, your stream will be
-						stuttering.
-						You could try lowering the bitrate limit.</span>
+				</div>
 
+				<div class="form-group">
+					<label for="displayname">이름</label>
+					<input class="form-control" type="text" placeholder="Choose a display name" autocomplete="off" id="displayname"></input>
+				</div>
+
+				<buttton class="form-control btn btn-info" id="btn-confirm-name">확인</input>
+			</div>
+		</div>
+
+		<div class="row mt-4 pd-4" id="lobby" style="display:none;background:#fff">
+			<div class="container">
+				<div class="input-group">
+					<input class="form-control" id="room-desc">
+					<div class="input-group-append">
+						<button class="btn btn-green" id="btn-create-room">방생성</button>
+					</div>
+				</div>
+				<div class="row justify-content-center my-2" id="reconnect-room-container" style="display:none">
+					<label><small>이전에 진행하던 방송이 있습니다. 재연결 하시겠습니까?</small></label>
+					<div class="col-2">
+						<button class="btn-sm btn-outline-secondary" id="btn-reconnect">재접속</button>
+					</div>
+				</div>
+				<div class="form-group text-center">
+					<label class="pt-4">방목록</label>
+					<ul class="list-group" id="room-list"></ul>
 				</div>
 			</div>
 		</div>
 
-		<div id="subscriber" style="display:none">
-			<span id="substatus">Loading...</span><br>
-			<video style="max-width:100%; max-height:100%" id="remotestream" autoplay playsinline muted></video>
+		<div class="row h-100 border border-top-0" id="main-container" style="display:none">
+			<div class="col-lg-1 border-right" id="sidemenu" style="background:#fff;max-width:60px">
+				<div class="row align-items-end">
+					<div class="row my-2 mx-0">
+						<a class="col">
+							<img src="img/ic-user.png" style="filter:invert(75%)">
+						</a>
+					</div>
+					<div class="row my-2 mx-0">
+						<a class="col">
+							<img src="img/ic-settings.png" style="filter:invert(75%)">
+						</a>
+					</div>
+				</div>
+			</div>
+			<div id="publisher" class="col-md-7 px-0 align-self-start border-right" style="display:none;max-width:768px">
+				<div id="prestart">
+					<div class="splash-msg">
+					</div>
+				</div>
+				<div id="poststart" style="display:none">
+					<div id="loading">
+						<div class="splash-msg">
+						</div>
+					</div>
+	
+					<div class="player row position-relative mx-0" style="padding-top:56.25%">
+						<!-- <canvas style="max-width:100%; max-height:100%" id="myvideo"></canvas> -->
+						<video id="myvideo" class="position-absolute" style="top:0;left:0;height:100%" autoplay playsinline muted="muted"></video>
+						<div class="overlay">
+							<div class="floating-container">
+								<button id="btn-facedetect" class="btn btn-floating" title="Face Detection"><img class="icon" src="img/ic-face-detection.png"></button>
+								<button id="btn-subscribe-call" class="btn btn-floating" style="display:none"><img class="icon" src="img/ic-call.png"></button>
+								<button id="btn-subscribe-mute" class="btn btn-floating" style="background:#fff"><img class="icon" src="img/ic-volume-off.png"></button>
+							</div>
+						</div>
+
+					</div>
+					<div class="row m-0 border-bottom" id="show-streamurl" style="display:none">
+						<a target="_blank" id="streamurl"></a>
+					</div>
+					<div class="row" style="background: none">
+						<div class="col px-5 py-3">
+							<label class="font-weight-bold" style="letter-spacing:-1px">참여자 목록</label>
+						</div>
+					</div>
+					<div class="row">
+						<ul id="feed-list"></ul>
+					</div>
+				</div>
+			</div>
+	
+			<!-- <div id="subscriber" class="col-md-7 px-0 align-self-start border-right" style="display:none;max-width:768px">
+				<span id="substatus">Loading...</span>
+				<div class="player row position-relative mx-0" style="padding-top:56.25%">
+					<video id="remotestream" class="position-absolute" style="top:0;left:0;height:100%" autoplay playsinline muted></video>
+					<div class="overlay">
+						<div class="floating-container w-100 text-center">
+							<button id="btn-subscribe-call" class="btn btn-floating" style="background:#3cb043"><img class="icon" src="img/ic-call.png"></button>
+							<button id="btn-subscribe-mute" class="btn btn-floating" style="background:#fff"><img class="icon" src="img/ic-volume-off.png"></button>
+						</div>
+					</div>
+				</div>
+
+				<div class="row" style="background: none">
+					<div class="col">
+						<label class="p-3 font-weight-bold" style="letter-spacing:-1px">참여자 목록</label>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col">
+						<ul id="stream-list"></ul>
+					</div>
+				</div>
+			</div> -->
+
+			<div id="chat-wrapper" class="col col-lg-4 border-right" style="display:none;background:#f7f7f7">
+				<div class="row align-items-start h-100" style="padding-bottom:39px">
+					<div id="chat-list-wrapper" class="col overflow-auto px-1 h-100">
+						<ul id="chat-list"></ul>
+					</div>
+				</div>
+				<div class="row position-absolute w-100" style="bottom:0">
+					<div class="input-group border-top">
+						<input id="chat-input" class="form-control rounded-0 border-0">
+						<div class="input-group-append">
+							<button id="btn-chat-send" class="btn btn-info rounded-0">Send</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="position-absolute container" style="display:none; top:0; right: 0; width: 320px; margin-top: 8px; background: #fff">
+				<div class="row border-bottom py-1">
+					<div class="col-sm-5">
+						<label class="title"><small>Video Resolution</small></label>
+					</div>
+					<div class="col-sm-7">
+						<select class="form-control form-control-sm" id="video-res">
+							<option value="1">320 x 240</option>
+							<option value="2" default>640 x 360</option>
+							<option value="3">1280 x 720</option>
+						</select>
+					</div>
+				</div>
+				<div class="row border-bottom py-1 mb-md-3">
+					<div class="col-sm-5">
+						<label class="title"><small>Bitrate limit</small></label>
+					</div>
+					<div class="col-sm-7">
+						<select class="form-control form-control-sm" id="bitrate">
+							<option value="0" default>No limit</option>
+							<option value="64">64 kbit/sec</option>
+							<option value="128">128 kbit/sec</option>
+							<option value="256">256 kbit/sec</option>
+							<option value="512">512 kbit/sec</option>
+							<option value="1024">1 mbit/sec</option>
+							<option value="2048">2 mbit/sec</option>
+						</select>
+					</div>
+				</div>
+				<div class="row border-top border-bottom py-1">
+					<div class="col-sm-5">
+						<small>Face Detection</small>
+					</div>
+					<div class="col-sm-7">
+						<div class="custom-control custom-switch">
+							<input type="checkbox"
+								class="custom-control-input"
+								id="switch-posenet"
+								data-toggle="collapse"
+								data-target="#fd-controller"
+								aria-expanded="false"
+								aria-controls="fd-controller">
+							<label class="custom-control-label text-sm"
+								for="switch-posenet">
+							</label>
+						</div>
+					</div>
+				</div>
+				<div class="collapse row" id="fd-controller">
+					<div class="container">
+						<div class="row py-sm-1">
+							<div class="col-sm-5"><label class="title"><small>method</small></label></div>
+							<div class="col-sm-7">
+								<select class="form-control form-control-sm" id="fd-method">
+									<option value="single-person" selected>single-pose</option>
+									<option value="multi-person">multi-pose</option>
+								</select>
+							</div>
+						</div>
+						<div class="row py-1 border-top border-bottom" style="background: #fff">
+							<div class="col-sm">
+								<small>Input</small>
+							</div>
+						</div>
+						<div class="row pt-1">
+							<div class="col-sm-5"><label class="title"><small>architecture</small></label></div>
+							<div class="col-sm-7">
+								<select class="form-control form-control-sm" id="fd-architecture">
+									<option value="MobileNetV1" selected>MobileNetV1</option>
+									<option value="ResNet50">ResNet50</option>
+								</select>
+							</div>
+						</div>
+						<div class="row pt-1">
+							<div class="col-sm-5"><label class="title"><small>inputResolution</small></label></div>
+							<div class="col-sm-7">
+								<select class="form-control form-control-sm" id="fd-input-res">
+									<option value="250">250</option>
+									<option value="500" selected>500</option>
+									<option value="700">700</option>
+								</select>
+							</div>
+						</div>
+						<div class="row pt-1">
+							<div class="col-sm-5"><label class="title"><small>outputStride</small></label></div>
+							<div class="col-sm-7">
+								<select class="form-control form-control-sm" id="fd-output-stride">
+									<option value="8">8</option>
+									<option value="16" selected>16</option>
+								</select>
+							</div>
+						</div>
+						<div class="row pt-1">
+							<div class="col-sm-5"><label class="title"><small>multiplier</small></label></div>
+							<div class="col-sm-7">
+								<select class="form-control form-control-sm" id="fd-multiplier">
+									<option value="1">1</option>
+									<option value="0.75" selected>0.75</option>
+									<option value="0.5">0.5</option>
+								</select>
+							</div>
+						</div>
+						<div class="row pt-1">
+							<div class="col-sm-5"><label class="title"><small>quantBytes</small></label></div>
+							<div class="col-sm-7">
+								<select class="form-control form-control-sm" id="fd-quant-bytes">
+									<option value="1">1</option>
+									<option value="2" selected>2</option>
+									<option value="4">4</option>
+								</select>
+							</div>
+						</div>
+	
+						<div class="row py-1 border-top border-bottom" style="background: #fff">
+							<div class="col-sm">
+								<small>Pose Detection</small>
+							</div>
+						</div>
+						<div class="row pt-1">
+							<div class="col-sm-5"><label class="title">
+								<small>maxPoseDetections</small></label>
+							</div>
+							<div class="col-sm-5">
+								<input type="range" class="custom-range" min="1" max="20" step="1" id="fd-max-pose-detect" disabled>
+							</div>
+							<div class="col-sm-2">
+								<small><label class="value">5</label></small>
+							</div>
+						</div>
+						<div class="row pt-1">
+							<div class="col-sm-5">
+								<label class="title"><small>minPoseConfidence</small></label>
+							</div>
+							<div class="col-sm-5">
+								<input type="range" class="custom-range" min="0" max="1" step="0.01" value="0.1" id="fd-min-pose-conf">
+							</div>
+							<div class="col-sm-2">
+								<small><label class="value">0.1</label></small>
+							</div>
+						</div>
+						<div class="row pt-1">
+							<div class="col-sm-5"><label class="title"><small>minPartConfidence</small></label></div>
+							<div class="col-sm-5">
+								<input type="range" class="custom-range" min="0" max="1" step="0.01" value="0.5" id="fd-min-part-conf">
+							</div>
+							<div class="col-sm-2">
+								<small><label class="value">0.5</label></small>
+							</div>
+						</div>
+						<div class="row pt-1">
+							<div class="col-sm-5"><label class="title"><small>nmsRadius</small></label></div>
+							<div class="col-sm-5">
+								<input type="range" class="custom-range" min="0" max="40" step="1" value="30" id="fd-nms-radius" disabled>
+							</div>
+							<div class="col-sm-2">
+								<small><label class="value">30</label></small>
+							</div>
+						</div>
+	
+						<div class="row py-1 border-top border-bottom" style="background: #fff">
+							<div class="col-sm">
+								<small>Output</small>
+							</div>
+						</div>
+						<div class="row pt-1">
+							<div class="col-sm-5"><label class="title">
+								<small>FaceOnly</small></label>
+							</div>
+							<div class="col-sm-7">
+								<div class="custom-control custom-checkbox">
+									<input type="checkbox" class="custom-control-input" id="fd-opt-face" checked>
+									<label class="custom-control-label" for="fd-opt-face"></label>
+								  </div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="position-absolute container" id="alert" style="display:none">		
+				<span id="slowlink" class="toast-new" style="opacity:1">SLOW LINK</span>
+				<span id="slowlink-explain" style="display:none">If you're getting lots of <span
+						style="color:red;font-family:monospace">SLOW LINK</span> warnings, your stream will be
+					stuttering.
+					You could try lowering the bitrate limit.</span>
+			</div>
+
 		</div>
+
+
 
 	</div>
 
@@ -259,10 +405,13 @@
 	<script type="text/javascript" src="js/bootstrap.min.js"></script>
 	<script type="text/javascript" src="js/adapter-latest.js"></script>
 	<script type="text/javascript" src="js/janus.js"></script>
+	<script type="text/javascript" src="js/userinfo.js"></script>
 	<script type="text/javascript" src="js/videoroom.js"></script>
+	<script type="text/javascript" src="js/textroom.js"></script>
 	<script type="text/javascript" src="js/jetstream.js"></script>
 	<script type="text/javascript" src="js/facedetect.js"></script>
 	<script type="text/javascript" src="js/stream-mixer.min.js"></script>
+	<script type="text/javascript" src="js/volume-meter.js"></script>
 
 </body>
 

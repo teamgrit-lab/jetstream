@@ -2376,33 +2376,34 @@ function Janus(gatewayCallbacks) {
 						navigator.mediaDevices.getUserMedia(gumConstraints)
 							.then(async function(stream) {
 								pluginHandle.consentDialog(false);
-								if(!StreamMixer.initSuccess()) {
-									await StreamMixer.init('myvideo');
-								}
-								await StreamMixer.addMedia({
-									source: stream,
-									sourceType: 'stream',
-									video: {
-										zIndex: 1,
-										top: 0,
-										left: 0,
-										// width: 320,
-										// height: 180,
-										// width: 640,
-										// height: 360,
-										// width: localStream.getVideoTracks()[0].getSettings().width,
-										// height: localStream.getVideoTracks()[0].getSettings().height,
-										width: 640,
-										height: 360,
-										// chromakey: true
-										// fullscreen: true
-									},
-									audio: {
-										mediaType: 'mycam'
-									}
-								})
-								StreamMixer.getStream().getVideoTracks()[0].position = {t:0,l:0,w:100,h:100}
-								streamsDone(handleId, jsep, media, callbacks, StreamMixer.getStream());
+								// if(!StreamMixer.initSuccess()) {
+								// 	await StreamMixer.init('myvideo');
+								// }
+								// await StreamMixer.addMedia({
+								// 	source: stream,
+								// 	sourceType: 'stream',
+								// 	video: {
+								// 		zIndex: 1,
+								// 		top: 0,
+								// 		left: 0,
+								// 		// width: 320,
+								// 		// height: 180,
+								// 		// width: 640,
+								// 		// height: 360,
+								// 		// width: localStream.getVideoTracks()[0].getSettings().width,
+								// 		// height: localStream.getVideoTracks()[0].getSettings().height,
+								// 		width: 640,
+								// 		height: 360,
+								// 		// chromakey: true
+								// 		// fullscreen: true
+								// 	},
+								// 	audio: {
+								// 		mediaType: 'mycam'
+								// 	}
+								// })
+								// StreamMixer.getStream().getVideoTracks()[0].position = {t:0,l:0,w:100,h:100}
+								// streamsDone(handleId, jsep, media, callbacks, StreamMixer.getStream());
+								streamsDone(handleId, jsep, media, callbacks, stream);
 							}).catch(function(error) {
 								pluginHandle.consentDialog(false);
 								callbacks.error({code: error.code, name: error.name, message: error.message});

@@ -68,10 +68,6 @@
     border-radius: .2rem;
   }
 
-  label {
-    margin-bottom: .25rem;
-    line-height: 1;
-  }
 
   button.btn-green {
     background-color: #00B898;
@@ -85,4 +81,163 @@
 button.btn-green:active {
   background-color: #07a88d !important;
   border-color: #07a88d !important;
+}
+
+@media screen and (min-width: 769px) {
+  #chat-wrapper {
+    max-width:414px
+  }
+}
+
+#chat-list {
+  padding-inline-start: 0;
+  list-style-type: none;
+}
+
+.chat-msg {
+  display: flex;
+  flex-direction: row;
+  margin: 4px 64px 16px 4px;
+}
+.chat-msg.me {
+  margin: 4px 4px 16px 64px;
+}
+
+.chat-msg .img-container{
+  position: relative;
+  width: 40px;
+  padding: 4px;
+}
+
+.chat-msg .img-container img{
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: solid 1px #999;
+}
+
+.chat-msg .msg-container {
+  flex: 1;
+  font-size: 0.75em;
+}
+
+.chat-msg .msg-container .d-name {
+  position: relative;
+  display: block;
+  font-weight: 700;
+  line-height: 1.5em;
+  margin-bottom: 4px;
+  padding: 0 4px;
+}
+.chat-msg.me .msg-container .d-name {
+  text-align: right;
+}
+
+.chat-msg .msg-container .msg {
+  position: relative;
+  display: block;
+  /* background: #17a2b8; */
+  background: #fff;
+  color: #444;
+  padding: 8px;
+  border: solid 1px #777;
+  border-radius: 4px;
+  box-shadow: 0 2px 0 #777;
+}
+
+.chat-msg.me .msg-container .msg {
+  background: #17a2b8;
+  color: #fff;
+}
+
+.btn-profile-icon {
+  background: #fff;
+  outline: none;
+  border: none;
+  padding: 8px;
+  margin: 2px;
+  box-sizing: border-box;
+}
+
+.btn-profile-icon:hover {
+  background: #eee;
+}
+
+.btn-profile-icon.active {
+  border: solid 2px #17a2b8;
+  padding: 6px;
+}
+
+.btn.btn-floating {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  padding: 10px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0,0,0,.5);
+  margin: 0 8px;
+}
+
+.btn.btn-floating .icon {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+#feed-list { list-style-type:none; }
+
+.li-stream-card {
+  float: left;
+  position: relative;
+  background: #000;
+  /* margin: 20px; */
+  margin-bottom: 16px;
+  box-sizing: border-box;
+}
+
+.li-stream-card.active {
+  border: solid 3px red;
+}
+
+.li-stream-card video {
+  object-fit: cover;
+  width: 160px;
+  height: 90px;
+}
+
+.li-stream-card .name {
+  padding: 8px;
+  background: #fff;
+}
+
+.li-stream-card .btn-mute {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 8px
+}
+
+.li-stream-card .btn-mute img {
+  width: 16px;
+  height: 16px;
+}
+
+.li-stream-card .vol-meter{
+  position: absolute;
+  top: 90px;
+  width: 100%;
+  height: 6px;
+  background: #66ff00;
+}
+
+#btn-subscribe-call {
+  background:#3cb043;
+}
+
+#btn-subscribe-call.calling {
+  background:#f51b00;
 }
